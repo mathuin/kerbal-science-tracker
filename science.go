@@ -6,26 +6,35 @@ import (
 	"strings"
 )
 
-// ScienceTerm is the object holding the science term data.
-type ScienceTerm struct {
+// ScienceSubject is the object holding the data pertaining to this subject.
+// https://kerbalspaceprogram.com/api/class_science_subject.html
+type ScienceSubject struct {
 	// FIXME: break ID down into:
-	// - what scientific act (evaReport)
+	// - what experiment (evaReport)
 	// - what body (Kerbin)
-	// - what region (Srf for surface)
-	// - what mode (Splashed)
+	// - what situation (SrfSplashed) https://kerbalspaceprogram.com/api/_science_8cs.html
 	// - what biome (Water)
-	ID    string
-	Title string
-	DSC   int
-	SCV   float64
-	SBV   float64
-	Sci   float64
-	Cap   float64
+	// API has this as two calls:
+	// static string ScienceUtil.GetExperimentBodyName(string subjectID)
+	//
+	// static void ScienceUtil.GetExperimentFieldsFromScienceID	(
+	//	string subjectID,
+	//	out string BodyName,
+	//	out string Situation,
+	//	out string Biome
+	// )
+	ID              string
+	Title           string
+	DataScale       int
+	ScientificValue float64
+	SubjectValue    float64
+	Science         float64
+	ScienceCap      float64
 }
 
-// Fill fills the ScienceTerm with data from the Term object.
-func Fill(t *Term) (*ScienceTerm, error) {
-	s := &ScienceTerm{}
+// Fill fills the ScienceSubject with data from the Term object.
+func Fill(t *Term) (*ScienceSubject, error) {
+	s := &ScienceSubject{}
 	if t.Terms == nil {
 		return nil, errors.New("no terms in science term")
 	}
@@ -41,27 +50,27 @@ func Fill(t *Term) (*ScienceTerm, error) {
 		case "title":
 			s.Title = val
 		case "dsc":
-			s.DSC, err = strconv.Atoi(val)
+			s.DataScale, err = strconv.Atoi(val)
 			if err != nil {
 				return nil, err
 			}
 		case "scv":
-			s.SCV, err = strconv.ParseFloat(val, 64)
+			s.ScientificValue, err = strconv.ParseFloat(val, 64)
 			if err != nil {
 				return nil, err
 			}
 		case "sbv":
-			s.SBV, err = strconv.ParseFloat(val, 64)
+			s.SubjectValue, err = strconv.ParseFloat(val, 64)
 			if err != nil {
 				return nil, err
 			}
 		case "sci":
-			s.Sci, err = strconv.ParseFloat(val, 64)
+			s.Science, err = strconv.ParseFloat(val, 64)
 			if err != nil {
 				return nil, err
 			}
 		case "cap":
-			s.Cap, err = strconv.ParseFloat(val, 64)
+			s.ScienceCap, err = strconv.ParseFloat(val, 64)
 			if err != nil {
 				return nil, err
 			}

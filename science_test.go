@@ -11,7 +11,7 @@ import (
 
 var filltests = []struct {
 	in  *Term
-	out *ScienceTerm
+	out *ScienceSubject
 	err error
 }{
 	{
@@ -43,14 +43,21 @@ var filltests = []struct {
 			&Term{Name: "sci", Values: []string{"5.6"}},
 			&Term{Name: "cap", Values: []string{"7.8"}},
 		}},
-		&ScienceTerm{ID: "id", Title: "title", DSC: 1, SCV: 2, SBV: 3.4, Sci: 5.6, Cap: 7.8},
+		&ScienceSubject{
+			ID:              "id",
+			Title:           "title",
+			DataScale:       1,
+			ScientificValue: 2,
+			SubjectValue:    3.4,
+			Science:         5.6,
+			ScienceCap:      7.8},
 		nil,
 	},
 }
 
 func TestFill(t *testing.T) {
 	for _, tt := range filltests {
-		var out *ScienceTerm
+		var out *ScienceSubject
 		var err error
 		out, err = Fill(tt.in)
 		if !reflect.DeepEqual(out, tt.out) {

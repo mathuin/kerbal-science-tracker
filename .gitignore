@@ -12,3 +12,7 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# generated binaries and typical test files
+kerbal-science-tracker
+persistent.sfs

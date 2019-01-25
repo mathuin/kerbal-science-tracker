@@ -40,19 +40,26 @@ func main() {
 	var numterms int
 	var totsci float64
 	var capsci float64
+	var ids []string
 
 	for _, term := range scienceTerms {
 		//		repr.Println(term)
-		var st *ScienceTerm
+		var st *ScienceSubject
 		st, err = Fill(term)
 		if err != nil {
 			continue
 		}
 		numterms = numterms + 1
-		totsci = totsci + st.Sci
-		capsci = capsci + st.Cap
+		totsci = totsci + st.Science
+		capsci = capsci + st.ScienceCap
+		if len(ids) < 10 {
+			ids = append(ids, st.ID)
+		}
 	}
 
 	fmt.Printf("%d missions, %0.2f total science, %0.2f capacity science\n", numterms, totsci, capsci)
+	for i, id := range ids {
+		fmt.Printf("%d: %s\n", i, id)
+	}
 
 }
