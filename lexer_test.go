@@ -21,8 +21,11 @@ func TestLexer(t *testing.T) {
 	for _, tt := range lexertests {
 
 		gstring := strings.NewReader(strings.Join(tt.in, "\n"))
-
-		tokens, err := lexer.ConsumeAll(savefileLexer.Lex(gstring))
+		glex, err := savefileLexer.Lex(gstring)
+		if err != nil {
+			t.Error(err)
+		}
+		tokens, err := lexer.ConsumeAll(glex)
 		if err != nil {
 			t.Error(err)
 		}

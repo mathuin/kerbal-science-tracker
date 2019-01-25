@@ -7,23 +7,23 @@ import (
 	"github.com/alecthomas/participle/lexer"
 )
 
-var savefileLexer = lexer.Unquote(lexer.Must(lexer.Regexp(
+var savefileLexer = lexer.Must(lexer.Regexp(
 	`(?m)` +
 		`^([\t\f\r ]+)` +
 		`|(?P<Token>[^\n}{=]*[^\n}{= ])` +
 		`|(?P<Brace>[}{])` +
 		`|(?P<Equal>=)` +
 		`|(?P<Newline>\n)`,
-)))
+))
 
 // Load fills a SaveFile with Terms from a byte array.
 func (s *SaveFile) Load(b []byte) {
 	gstring := bytes.NewReader(b)
 
-	var parser *participle.Parser
-	parser = participle.MustBuild(&SaveFile{}, savefileLexer)
+	parser, err := participle.Build(&SaveFile{}, participle.Lexer(savefileLexer))
 
-	err := parser.Parse(gstring, s)
+	check(err)
+	err = parser.Parse(gstring, s)
 	check(err)
 }
 
