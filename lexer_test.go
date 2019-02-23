@@ -14,7 +14,10 @@ var lexertests = []struct {
 	in  []string
 	out []string
 }{
-	{[]string{"GAME", "{", "    Hello = World", "}"}, []string{"Token", "Newline", "Brace", "Newline", "Token", "Equal", "Token", "Newline", "Brace", "EOF"}},
+	{[]string{"GAME", "{", "    Hello = World", "}"}, []string{"Name", "Newline", "Open", "Newline", "Property", "Newline", "Close", "EOF"}},
+	{[]string{"Science", "{", "	id = temperatureScan@KerbinSrfLandedLaunchPad", "	title = Temperature Scan from LaunchPad", "	dsc = 1", "	scv = 0", "	sbv = 0.300000012", "	sci = 1.20000005", "	cap = 1.20000005", "}"}, []string{"Name", "Newline", "Open", "Newline", "Property", "Newline", "Property", "Newline", "Property", "Newline", "Property", "Newline", "Property", "Newline", "Property", "Newline", "Property", "Newline", "Close", "EOF"}},
+	{[]string{"file", "{", "		filename = launch.ks", "		binary = H4sIADjSWlwA,12NQQrCMBRE180pPlm1UIq4syAoKlqEVpq6lq+mTSAmIUkFFe9uu1NnOe8Ns1D4fHTKnFGBaduMWHR444E7WFoD0sN0MuYbiGs3gtlQEtnC,qjlnTvP86outkW5WRdNVcMcKDvsKBgHTEibl8M6XxkdUGofU8aaiibwIlHkem0xiJgq7PVFnLwPhqZoTTo8JRl5A1eej+q,if7yI5IPAoH67M8AAAA=", "}"}, []string{"Name", "Newline", "Open", "Newline", "Property", "Newline", "Property", "Newline", "Close", "EOF"}},
+	{[]string{"bad", "{", "    linkURL =", "}"}, []string{"Name", "Newline", "Open", "Newline", "Property", "Newline", "Close", "EOF"}},
 }
 
 func TestLexer(t *testing.T) {
@@ -56,16 +59,19 @@ var parsertests = []struct {
 }{
 	{[]string{""}, &SaveFile{}},
 	{[]string{"GAME", "{", "}"}, &SaveFile{&Term{Name: "GAME"}}},
-	{[]string{"GAME", "{", "    Hello = World", "}"}, &SaveFile{&Term{Name: "GAME", Terms: []*Term{&Term{Name: "Hello", Values: []string{"World"}}}}}},
+	{[]string{"GAME", "{", "    Hello = World", "}"}, &SaveFile{&Term{Name: "GAME", Terms: []*Term{&Term{Property: "Hello = World"}}}}},
 	{[]string{"GAME", "{", "    INNER", "    {", "    }", "}"}, &SaveFile{&Term{Name: "GAME", Terms: []*Term{&Term{Name: "INNER"}}}}},
-	{[]string{"GAME", "{", "    INNER", "    {", "        Hello = World", "    }", "}"}, &SaveFile{&Term{Name: "GAME", Terms: []*Term{&Term{Name: "INNER", Terms: []*Term{&Term{Name: "Hello", Values: []string{"World"}}}}}}}},
+	{[]string{"GAME", "{", "    INNER", "    {", "        Hello = World", "    }", "}"}, &SaveFile{&Term{Name: "GAME", Terms: []*Term{&Term{Name: "INNER", Terms: []*Term{&Term{Property: "Hello = World"}}}}}}},
 }
 
 func TestParser(t *testing.T) {
 	for _, tt := range parsertests {
 
 		savefile := &SaveFile{}
-		savefile.Load([]byte(strings.Join(tt.in, "\n")))
+		err := savefile.Load([]byte(strings.Join(tt.in, "\n")))
+		if err != nil {
+			t.Error(err)
+		}
 
 		if !reflect.DeepEqual(savefile, tt.out) {
 			errout := new(bytes.Buffer)

@@ -20,37 +20,44 @@ var filltests = []struct {
 		errors.New("no terms in science term"),
 	},
 	{
-		&Term{Name: "novalues", Terms: []*Term{
+		&Term{Name: "noproperties", Terms: []*Term{
 			&Term{Name: "novalue"},
 		}},
 		nil,
-		errors.New("no values in science term"),
+		errors.New("no properties in science term"),
 	},
 	{
-		&Term{Name: "wrongvalues", Terms: []*Term{
-			&Term{Name: "wrongvalue", Values: []string{"wrong"}},
+		&Term{Name: "badproperties", Terms: []*Term{
+			&Term{Property: "wrong"},
 		}},
 		nil,
-		errors.New("invalid name in science term"),
+		errors.New("improper property 'wrong' in science term"),
+	},
+	{
+		&Term{Name: "wrongproperties", Terms: []*Term{
+			&Term{Property: "wrong = 1"},
+		}},
+		nil,
+		errors.New("invalid name 'wrong' in science term"),
 	},
 	{
 		&Term{Name: "good", Terms: []*Term{
-			&Term{Name: "id", Values: []string{"id"}},
-			&Term{Name: "title", Values: []string{"title"}},
-			&Term{Name: "dsc", Values: []string{"1"}},
-			&Term{Name: "scv", Values: []string{"2.0"}},
-			&Term{Name: "sbv", Values: []string{"3.4"}},
-			&Term{Name: "sci", Values: []string{"5.6"}},
-			&Term{Name: "cap", Values: []string{"7.8"}},
+			&Term{Property: "id = recovery@MinmusFlewBy"},
+			&Term{Property: "title = Recovery of a vessel returned from a flight over Minmus"},
+			&Term{Property: "dsc = 1"},
+			&Term{Property: "scv = 0.027777778"},
+			&Term{Property: "sbv = 15"},
+			&Term{Property: "sci = 17.5"},
+			&Term{Property: "cap = 18"},
 		}},
 		&ScienceSubject{
-			ID:              "id",
-			Title:           "title",
-			DataScale:       1,
-			ScientificValue: 2,
-			SubjectValue:    3.4,
-			Science:         5.6,
-			ScienceCap:      7.8},
+			ID:              "recovery@MinmusFlewBy",
+			Title:           "Recovery of a vessel returned from a flight over Minmus",
+			DataScale:       1.0,
+			ScientificValue: 0.027777778,
+			SubjectValue:    15.0,
+			Science:         17.5,
+			ScienceCap:      18.0},
 		nil,
 	},
 }

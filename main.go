@@ -4,14 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 
 func main() {
 	// https://gist.github.com/mashbridge/4365101
@@ -21,15 +16,18 @@ func main() {
 	switch flag.NArg() {
 	case 0:
 		data, err = ioutil.ReadAll(os.Stdin)
-		check(err)
+		if err != nil {
+			log.Fatal(err)
+		}
 		break
 	case 1:
 		data, err = ioutil.ReadFile(flag.Arg(0))
-		check(err)
+		if err != nil {
+			log.Fatal(err)
+		}
 		break
 	default:
-		fmt.Printf("input must be from stdin or file\n")
-		os.Exit(1)
+		log.Fatal("input must be from stdin or file\n")
 	}
 
 	savefile := &SaveFile{}
@@ -43,7 +41,7 @@ func main() {
 	var ids []string
 
 	for _, term := range scienceTerms {
-		//		repr.Println(term)
+		// repr.Println(term)
 		var st *ScienceSubject
 		st, err = Fill(term)
 		if err != nil {
