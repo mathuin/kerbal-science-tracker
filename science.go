@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -25,7 +26,7 @@ type ScienceSubject struct {
 	// )
 	ID              string
 	Title           string
-	DataScale       int
+	DataScale       float64
 	ScientificValue float64
 	SubjectValue    float64
 	Science         float64
@@ -40,42 +41,45 @@ func Fill(t *Term) (*ScienceSubject, error) {
 	}
 	for _, term := range t.Terms {
 		var err error
-		if term.Values == nil {
-			return nil, errors.New("no values in science term")
+		if term.Property == "" {
+			return nil, errors.New("no properties in science term")
 		}
-		val := strings.Join(term.Values, ", ")
-		switch term.Name {
+		terms := strings.SplitN(term.Property, " = ", 2)
+		if len(terms) != 2 {
+			return nil, fmt.Errorf("improper property '%s' in science term", term.Property)
+		}
+		switch terms[0] {
 		case "id":
-			s.ID = val
+			s.ID = terms[1]
 		case "title":
-			s.Title = val
+			s.Title = terms[1]
 		case "dsc":
-			s.DataScale, err = strconv.Atoi(val)
+			s.DataScale, err = strconv.ParseFloat(terms[1], 64)
 			if err != nil {
 				return nil, err
 			}
 		case "scv":
-			s.ScientificValue, err = strconv.ParseFloat(val, 64)
+			s.ScientificValue, err = strconv.ParseFloat(terms[1], 64)
 			if err != nil {
 				return nil, err
 			}
 		case "sbv":
-			s.SubjectValue, err = strconv.ParseFloat(val, 64)
+			s.SubjectValue, err = strconv.ParseFloat(terms[1], 64)
 			if err != nil {
 				return nil, err
 			}
 		case "sci":
-			s.Science, err = strconv.ParseFloat(val, 64)
+			s.Science, err = strconv.ParseFloat(terms[1], 64)
 			if err != nil {
 				return nil, err
 			}
 		case "cap":
-			s.ScienceCap, err = strconv.ParseFloat(val, 64)
+			s.ScienceCap, err = strconv.ParseFloat(terms[1], 64)
 			if err != nil {
 				return nil, err
 			}
 		default:
-			return nil, errors.New("invalid name in science term")
+			return nil, fmt.Errorf("invalid name '%s' in science term", terms[0])
 		}
 	}
 	return s, nil

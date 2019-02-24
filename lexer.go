@@ -10,34 +10,39 @@ import (
 var savefileLexer = lexer.Must(lexer.Regexp(
 	`(?m)` +
 		`^([\t\f\r ]+)` +
-		`|(?P<Token>[^\n}{=]*[^\n}{= ])` +
-		`|(?P<Brace>[}{])` +
-		`|(?P<Equal>=)` +
+		`|(?P<Property>[^\n]+)(?P<Equal> = ?)(?P<Value>[^\n]+)?` +
+		`|(?P<Name>[^\n}{]+)` +
+		`|(?P<Open>{)` +
+		`|(?P<Close>})` +
 		`|(?P<Newline>\n)`,
 ))
 
 // Load fills a SaveFile with Terms from a byte array.
-func (s *SaveFile) Load(b []byte) {
+func (s *SaveFile) Load(b []byte) error {
 	gstring := bytes.NewReader(b)
 
 	parser, err := participle.Build(&SaveFile{}, participle.Lexer(savefileLexer))
-
-	check(err)
+	if err != nil {
+		return err
+	}
 	err = parser.Parse(gstring, s)
-	check(err)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // SaveFile represents the entire save file.
 type SaveFile struct {
-	Term *Term `{ @@ }`
+	Term *Term `parser:"{ @@ }"`
 }
 
 // Term is either a Group or a Property.
 // Group information is stored in Terms while Property information is stored in Values.
 type Term struct {
-	Name   string   `@Token`
-	Values []string `( Equal { @Token } Newline`
-	Terms  []*Term  `| Newline '{' Newline { @@ } '}' { Newline } )`
+	Name     string  `parser:"( @Name Newline"`
+	Terms    []*Term `parser:"Open Newline { @@ } Close { Newline } )"`
+	Property string  `parser:"| @Property Newline"`
 }
 
 // GetTerms returns a list of pointers to Term objects with names matching the string argument.
